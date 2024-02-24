@@ -21,7 +21,7 @@ import (
 
 const (
 	ImgDir              = "images"
-	ItemsShemaPath      = "../db/items.json"
+	ItemsShemaPath      = "../db/items.db"
 	CategoriesShemaPath = "../db/categories.db"
 	DBPath              = "../db/mercari.sqlite3"
 )
