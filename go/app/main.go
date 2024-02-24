@@ -61,11 +61,11 @@ func (s ServerImpl) createTables() error {
 	}
 
 	// テーブルがない場合は作成
-	if _, err := s.db.Exec(string(itemsSchema)); err != nil {
-		return fmt.Errorf("failed to create items table: %w", err)
-	}
 	if _, err := s.db.Exec(string(categoriesSchema)); err != nil {
 		return fmt.Errorf("failed to create categories table: %w", err)
+	}
+	if _, err := s.db.Exec(string(itemsSchema)); err != nil {
+		return fmt.Errorf("failed to create items table: %w", err)
 	}
 
 	return nil
