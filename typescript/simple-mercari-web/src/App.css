@@ -44,12 +44,13 @@
 	padding: 0.2rem 2rem;
 	font-weight: bold;
 	border: 1px solid #6a6a66;
-	background: #e6d72a;
+	background: #f5ec8c;
 	color: #5d5b5b;
 	transition: 0.5s;
 }
+
 .submit-button:hover {
-	color: #e6d72a;
+	color: #f5ec8c;
 	background: #fff;
 }
 

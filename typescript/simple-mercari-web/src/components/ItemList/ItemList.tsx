@@ -47,8 +47,8 @@ export const ItemList: React.FC<Prop> = (props) => {
 
   return (
     <div className="grid-container">
-      {items.map((item) => {
-        return (
+      {items && items.length > 0 && (
+        items.map((item) => (
           <div key={item.id} className='ItemList'>
             {/* TODO: Task 1: Replace the placeholder image with the item image */}
             <img className="item-image" src={server + "/image/" + item.id} />
@@ -60,8 +60,8 @@ export const ItemList: React.FC<Prop> = (props) => {
             </p>
             </div>
           </div>
-        )
-      })}
+        ))
+      )}
     </div>
   )
 };
