@@ -271,7 +271,7 @@ func LoadItemsFromJSON() (*Items, error) {
 
 func (s ServerImpl) getImg(c echo.Context) error {
 	// itemのidを取得
-	id, err := strconv.Atoi(c.Param("imageID"))
+	id, err := strconv.Atoi(c.Param("imageFilename"))
 	if err != nil {
 		c.Logger().Errorf("Failed to convert id to int in getImg: %v,", err)
 		return echo.NewHTTPError(http.StatusBadRequest, "failed to convert id to int")
@@ -337,7 +337,7 @@ func main() {
 	e.GET("/items", serverImpl.getAllItems)
 	e.GET("/search", serverImpl.getItemsByKeyword)
 	e.GET("/items/:id", serverImpl.getItemById)
-	e.GET("/image/:imageID", serverImpl.getImg)
+	e.GET("/image/:imageFilename", serverImpl.getImg)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":9000"))
