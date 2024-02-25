@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -35,6 +34,7 @@ func root(c echo.Context) error {
 }
 
 type Item struct {
+	Id        int    `json:"id"`
 	Name      string `json:"name"`
 	Category  string `json:"category"`
 	ImageName string `json:"image_name"`
@@ -183,7 +183,7 @@ func (s ServerImpl) addItemToDB(name, category, imageName string) error {
 
 func (s ServerImpl) getAllItems(c echo.Context) error {
 	// itemsテーブルとcategoriesテーブルをJOINして全てのアイテムを取得
-	rows, err := s.db.Query("SELECT items.name, categories.name, items.image_name FROM items JOIN categories ON items.category_id = categories.id")
+	rows, err := s.db.Query("SELECT items.id, items.name, categories.name, items.image_name FROM items JOIN categories ON items.category_id = categories.id")
 	if err != nil {
 		c.Logger().Errorf("Failed to search items from DB in getAllItems: %v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to search items from DB")
@@ -193,7 +193,7 @@ func (s ServerImpl) getAllItems(c echo.Context) error {
 	var allItems Items
 	for rows.Next() {
 		var item Item
-		if err := rows.Scan(&item.Name, &item.Category, &item.ImageName); err != nil {
+		if err := rows.Scan(&item.Id, &item.Name, &item.Category, &item.ImageName); err != nil {
 			c.Logger().Errorf("Failed to scan items from DB in getAllItems: %v", err)
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to scan items from DB")
 		}
@@ -208,7 +208,7 @@ func (s ServerImpl) getItemsByKeyword(c echo.Context) error {
 
 	// DBから名前にキーワードを含む商品一覧を返す
 	rows, err := s.db.Query(`
-			SELECT items.name, categories.name, items.image_name 
+			SELECT items.id, items.name, categories.name, items.image_name 
 			FROM items JOIN categories ON items.category_id = categories.id 
 			WHERE items.name LIKE '%' || ? || '%'`, keyword)
 	if err != nil {
@@ -220,7 +220,7 @@ func (s ServerImpl) getItemsByKeyword(c echo.Context) error {
 	var keywordItems Items
 	for rows.Next() {
 		var item Item
-		if err := rows.Scan(&item.Name, &item.Category, &item.ImageName); err != nil {
+		if err := rows.Scan(&item.Id, &item.Name, &item.Category, &item.ImageName); err != nil {
 			c.Logger().Errorf("Failed to scan items from DB in getItemsByKeyword: %v", err)
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to scan items from DB")
 		}
@@ -238,12 +238,12 @@ func (s ServerImpl) getItemById(c echo.Context) error {
 
 	// DBからIDに対応する商品を取得
 	row := s.db.QueryRow(`
-			SELECT items.name, categories.name, items.image_name 
+			SELECT items.id, items.name, categories.name, items.image_name 
 			FROM items JOIN categories ON items.category_id = categories.id 
 			WHERE items.id = ?`, id)
 
 	var item Item
-	if err := row.Scan(&item.Name, &item.Category, &item.ImageName); err != nil {
+	if err := row.Scan(&item.Id, &item.Name, &item.Category, &item.ImageName); err != nil {
 		if errors.Is(err, sql.ErrNoRows) { // IDに対応する商品がない場合
 			c.Logger().Errorf("Item not found in DB: id=%d", id)
 			return echo.NewHTTPError(http.StatusNotFound, "item not found")
@@ -269,14 +269,30 @@ func LoadItemsFromJSON() (*Items, error) {
 	return &allItems, nil
 }
 
-func getImg(c echo.Context) error {
-	// Create image path
-	imgPath := path.Join(ImgDir, c.Param("imageFilename"))
-
-	if !strings.HasSuffix(imgPath, ".jpg") {
-		c.Logger().Errorf("Image path does not end with .jpg, got: %s", imgPath)
-		return echo.NewHTTPError(http.StatusInternalServerError, "Image path does not end with .jpg")
+func (s ServerImpl) getImg(c echo.Context) error {
+	// itemのidを取得
+	id, err := strconv.Atoi(c.Param("imageID"))
+	if err != nil {
+		c.Logger().Errorf("Failed to convert id to int in getImg: %v,", err)
+		return echo.NewHTTPError(http.StatusBadRequest, "failed to convert id to int")
 	}
+
+	stmt, err := s.db.Prepare("SELECT items.image_name FROM items WHERE items.id=?")
+	if err != nil {
+		c.Logger().Errorf("Failed to prepare SQL statement in getImg: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to prepare SQL statement")
+	}
+
+	var imgName string
+	if err := stmt.QueryRow(id).Scan(&imgName); err != nil {
+		c.Logger().Errorf("Failed to get image name in getImg: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get image name")
+	}
+
+	// imageのパスを作る
+	imgPath := path.Join(ImgDir, imgName)
+
+	// imageが存在しない場合はデフォルトの画像を返す
 	if _, err := os.Stat(imgPath); err != nil {
 		c.Logger().Infof("Image not found: %s", imgPath)
 		imgPath = path.Join(ImgDir, "default.jpg")
@@ -321,7 +337,7 @@ func main() {
 	e.GET("/items", serverImpl.getAllItems)
 	e.GET("/search", serverImpl.getItemsByKeyword)
 	e.GET("/items/:id", serverImpl.getItemById)
-	e.GET("/image/:imageFilename", getImg)
+	e.GET("/image/:imageID", serverImpl.getImg)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":9000"))
