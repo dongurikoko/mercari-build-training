@@ -17,5 +17,5 @@ RUN chown -R trainee:mercari /root
 WORKDIR /root/go
 
 USER trainee
-RUN go mod tidy
+RUN go mod download
 CMD ["go", "run", "app/main.go"]
