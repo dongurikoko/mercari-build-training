@@ -99,8 +99,9 @@
 .grid-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  padding: 0px 20px;
+  column-gap: 10px;
+  row-gap: 5px;
+  padding: 10px 10px;
 }
 .item-image {
   width: 200px;
