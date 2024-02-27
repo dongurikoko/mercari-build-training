@@ -305,6 +305,7 @@ func main() {
 	db, err := sql.Open("sqlite3", DBPath)
 	if err != nil {
 		e.Logger.Errorf("Failed to open DB: %v", err)
+		return
 	}
 	defer db.Close()
 
