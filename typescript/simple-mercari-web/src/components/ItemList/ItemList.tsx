@@ -45,9 +45,10 @@ export const ItemList: React.FC<Prop> = (props) => {
     }
   }, [reload]);
 
+  const existsItems = items && items.length > 0;
   return (
     <div className="grid-container">
-      {items && items.length > 0 && (
+      {existsItems && (
         items.map((item) => (
           <div key={item.id} className='ItemList'>
             {/* TODO: Task 1: Replace the placeholder image with the item image */}
