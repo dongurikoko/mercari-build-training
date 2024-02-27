@@ -21,8 +21,8 @@ import (
 
 const (
 	ImgDir              = "images"
-	ItemsShemaPath      = "../db/items.db"
-	CategoriesShemaPath = "../db/categories.db"
+	ItemsSchemaPath      = "../db/items.db"
+	CategoriesSchemaPath = "../db/categories.db"
 	DBPath              = "../db/mercari.sqlite3"
 )
 
@@ -51,11 +51,11 @@ type ServerImpl struct {
 // DBにテーブルを作成する
 func (s ServerImpl) createTables() error {
 	// スキーマを読み込む
-	itemsSchema, err := os.ReadFile(ItemsShemaPath)
+	itemsSchema, err := os.ReadFile(ItemsSchemaPath)
 	if err != nil {
 		return fmt.Errorf("failed to read items schema: %w", err)
 	}
-	categoriesSchema, err := os.ReadFile(CategoriesShemaPath)
+	categoriesSchema, err := os.ReadFile(CategoriesSchemaPath)
 	if err != nil {
 		return fmt.Errorf("failed to read categories schema: %w", err)
 	}
