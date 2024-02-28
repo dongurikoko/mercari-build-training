@@ -23,3 +23,7 @@ services:
     user: "trainee:mercari"
     environment:
       FRONT_URL: "http://localhost:3000"
+    # コンテナのデータを永続化(ホストOSとコンテナで共有)
+    volumes:
+      - ./go/images:/root/go/images
+      - ./db:/root/db
