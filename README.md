@@ -1,3 +1,6 @@
+## (追記)
+実装内容は、PRを見ていただけると分かりやすいと思います。
+
 # Build@Mercari Training Program 
 
 This is @dongurikoko's build training repository.
