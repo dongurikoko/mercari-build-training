@@ -8,7 +8,7 @@ interface Item {
 };
 
 const server = process.env.REACT_APP_API_URL || 'http://127.0.0.1:9000';
-const placeholderImage = process.env.PUBLIC_URL + '/logo192.png';
+const placeholderImage = process.env.PUBLIC_URL + '/image/';
 
 interface Prop {
   reload?: boolean;
@@ -45,21 +45,24 @@ export const ItemList: React.FC<Prop> = (props) => {
     }
   }, [reload]);
 
+  const existsItems = items && items.length > 0;
   return (
-    <div>
-      {items.map((item) => {
-        return (
+    <div className="grid-container">
+      {existsItems && (
+        items.map((item) => (
           <div key={item.id} className='ItemList'>
             {/* TODO: Task 1: Replace the placeholder image with the item image */}
-            <img src={placeholderImage} />
+            <img className="item-image" src={server + "/image/" + item.id} />
+            <div className="item-text">
             <p>
               <span>Name: {item.name}</span>
               <br />
               <span>Category: {item.category}</span>
             </p>
+            </div>
           </div>
-        )
-      })}
+        ))
+      )}
     </div>
   )
 };
