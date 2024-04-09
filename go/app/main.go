@@ -20,7 +20,10 @@ import (
 )
 
 const (
-	ImgDir = "images"
+	ImgDir              = "images"
+	ItemsSchemaPath      = "../db/items.db"
+	CategoriesSchemaPath = "../db/categories.db"
+	DBPath              = "../db/mercari.sqlite3"
 )
 
 type Response struct {
@@ -43,6 +46,29 @@ type Items struct {
 
 type ServerImpl struct {
 	db *sql.DB
+}
+
+// DBにテーブルを作成する
+func (s ServerImpl) createTables() error {
+	// スキーマを読み込む
+	itemsSchema, err := os.ReadFile(ItemsSchemaPath)
+	if err != nil {
+		return fmt.Errorf("failed to read items schema: %w", err)
+	}
+	categoriesSchema, err := os.ReadFile(CategoriesSchemaPath)
+	if err != nil {
+		return fmt.Errorf("failed to read categories schema: %w", err)
+	}
+
+	// テーブルがない場合は作成
+	if _, err := s.db.Exec(string(categoriesSchema)); err != nil {
+		return fmt.Errorf("failed to create categories table: %w", err)
+	}
+	if _, err := s.db.Exec(string(itemsSchema)); err != nil {
+		return fmt.Errorf("failed to create items table: %w", err)
+	}
+
+	return nil
 }
 
 func (s ServerImpl) addItem(c echo.Context) error {
@@ -276,13 +302,19 @@ func main() {
 	}))
 
 	// DBへの接続
-	db, err := sql.Open("sqlite3", "../db/mercari.sqlite3")
+	db, err := sql.Open("sqlite3", DBPath)
 	if err != nil {
-		e.Logger.Infof("Failed to open DB: %v", err)
+		e.Logger.Errorf("Failed to open DB: %v", err)
+		return
 	}
 	defer db.Close()
 
 	serverImpl := ServerImpl{db: db}
+
+	// テーブルの作成
+	if err := serverImpl.createTables(); err != nil {
+		e.Logger.Errorf("Failed to create tables: %v", err)
+	}
 
 	// Routes
 	e.GET("/", root)
