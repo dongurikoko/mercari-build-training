@@ -2,8 +2,12 @@
   text-align: center;
 }
 
+:root {
+  background-color: #98dbc6; /* 全体の背景色 */
+}
+
 .Title {
-  background-color: #222427;
+  background-color: #98dbc6;
   min-height: 8vh;
   display: flex;
   flex-direction: column;
@@ -11,28 +15,98 @@
   justify-content: left;
   font-size: calc(10px + 1vmin);
   color: white;
+}
+.Title p b {
+  text-shadow: 2px 2px 4px rgba(17, 17, 16, 0.938); /* テキストに影を追加 */
 }
 
 .Listing {
-  background-color: #222427;
-  min-height: 8vh;
+  display: grid;
+  place-items: center;
+  width: 50%;
+  margin: 0 auto;
+  background-color: #5bc8ac;
+}
+
+.Listing form > div {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: left;
-  font-size: calc(10px + 1vmin);
-  color: white;
+  flex-direction: column; /* 縦並びにする */
+  gap: 10px; /* 入力フィールド間のスペース */
+  padding: 20px 0;
+}
+
+.submit-button{
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	width: 250px;
+	margin: auto;
+	padding: 0.2rem 2rem;
+	font-weight: bold;
+	border: 1px solid #6a6a66;
+	background: #f5ec8c;
+	color: #5d5b5b;
+	transition: 0.5s;
+}
+
+.submit-button:hover {
+	color: #f5ec8c;
+	background: #fff;
 }
 
 .ItemList {
-  background-color: #222427;
-  min-height: 8vh;
+  position: relative;
+  padding: 1em 1.5em;
+  margin: 2em 0;
+  background-color: white;/*背景色*/
+  color: rgb(227, 234, 236);/*文字色*/
+  z-index: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: left;
-  font-size: calc(10px + 1vmin);
-  color: white;
+}
+.ItemList::before,
+.ItemList::after {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.ItemList::before {
+  background-color: rgba(255, 255, 255, 0.2);
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+.ItemList::after {
+  background-color: #f18d9e;/*ズレている方の背景色*/
+  top: 5px;
+  left: 5px;
+  z-index: -2;
+}
+.ItemList p {
+  margin: 0; 
+  padding: 0;
+}
+.item-text {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 10px;
+  row-gap: 5px;
+  padding: 10px 10px;
+}
+.item-image {
+  width: 200px;
+  height: 200px;
+  object-fit: cover; /* アスペクト比の維持 */
 }
 
 .App-link {

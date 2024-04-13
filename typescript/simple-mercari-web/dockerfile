@@ -1,7 +1,15 @@
 FROM node:20-alpine
-WORKDIR /app
 
 RUN addgroup -S mercari && adduser -S trainee -G mercari
+
+# dockerコンテナ内の作業ディレクトリ
+WORKDIR /app
+# /appの下にdockerfileが置かれているディレクトリの内容をコピー
+COPY . .
+RUN npm ci
+
+RUN chown -R trainee:mercari /app
 USER trainee
 
-CMD ["node", "-v"]
+EXPOSE 3000
+CMD ["npm", "start"]
